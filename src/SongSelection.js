@@ -16,8 +16,16 @@ function SongSelection({ auth0Id }) {
   };
 
   const saveSongs = async () => {
-    await axios.post('http://localhost:5001/api/user/songs', { auth0Id, songs: selectedSongs });
-    alert('Songs saved!');
+    try {
+      await axios.post('http://localhost:5001/api/user/songs', { 
+        auth0Id, 
+        songs: selectedSongs 
+      });
+      alert('Songs saved!');
+    } catch (error) {
+      console.error('Error saving songs:', error);
+      alert('Failed to save songs. Check the console for details.');
+    }
   };
 
   return (

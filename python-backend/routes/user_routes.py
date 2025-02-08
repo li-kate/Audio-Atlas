@@ -7,7 +7,7 @@ user_routes = Blueprint("user_routes", __name__)
 # Connect to MongoDB
 mongo_uri = os.getenv("MONGO_URI")
 client = MongoClient(mongo_uri)
-db = client["audio-atlas"]
+db = client["test"]
 users_collection = db["users"]
 
 @user_routes.route("/user", methods=["GET"])
