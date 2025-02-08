@@ -2,10 +2,26 @@
   "name": "audio-atlas",
   "version": "0.1.0",
   "private": true,
+  "overrides": {
+    "react-scripts": {
+      "@svgr/webpack": "8.1.0",
+      "typescript": "4.9.5",
+      "postcss": "8.4.38"
+    }
+  },
   "dependencies": {
+    "@auth0/auth0-react": "^2.3.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "ajv": "^8.17.1",
+    "ajv-keywords": "^5.1.0",
+    "auth0": "^4.18.0",
+    "axios": "^1.7.9",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.10.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-scripts": "5.0.1",
