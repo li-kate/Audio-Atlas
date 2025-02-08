@@ -1,70 +1,43 @@
-# Getting Started with Create React App
+# Audio Atlas
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Description
 
-## Available Scripts
+## Tools
 
-In the project directory, you can run:
+- **Auth0**: Log in, log out, register (https://github.com/auth0/auth0-react/)
+- **MongoDB Atlas**: Store user data
+- **React**: Frontend (V19)
 
-### `npm start`
+## Development
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+To run this project locally, there's some stuff to install and do.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+**In same folder as src**
+- npm install (npm@11.1.0)
+- npm i react@latest react-dom@latest
+- npm install @auth0/auth0-react axios
+- npm install ajv@latest ajv-keywords@latest
+- npm install --save react-router-dom
 
-### `npm test`
+**In server folder**
+- npm install express cors mongoose dotenv auth0
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+**In python-backend folder**
+- pip install spotipy
 
-### `npm run build`
+**NOT NEEDED - Set up MongoDB Atlas**
+- Need your own database and connection string into env file
+- get connection string: https://www.mongodb.com/docs/guides/atlas/connection-string/ 
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Run the Web App
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+make 3 terminals lolz
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+**cd python-backend**
+- python app.py
 
-### `npm run eject`
+**cd server**
+- node index.js
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+**same file as src but not cd src hopefully you understand**
+- npm start
