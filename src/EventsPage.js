@@ -3,9 +3,10 @@ import axios from 'axios';
 
 function EventsPage({ auth0Id }) {
   const [events, setEvents] = useState([]);
+  const [recommendedEvents, setRecommendedEvents] = useState([]);
   const [attendingEvents, setAttendingEvents] = useState([]);
 
-  // Fetch events and user's attending events
+  // Fetch events, recommended events, and user's attending events
   useEffect(() => {
     // Fetch all events
     axios.get('http://localhost:5001/api/events')
@@ -15,11 +16,21 @@ function EventsPage({ auth0Id }) {
       })
       .catch(error => console.error('Error fetching events:', error));
 
+    // Fetch recommended events
+    if (auth0Id) {
+      axios.get(`http://localhost:5001/api/events/recommended?userId=${auth0Id}`)
+        .then(response => {
+          console.log("Fetched recommended events:", response.data.recommendedEvents); // Log the fetched data
+          setRecommendedEvents(response.data.recommendedEvents || []);
+        })
+        .catch(error => console.error('Error fetching recommended events:', error));
+    }
+
     // Fetch user's attending events
     if (auth0Id) {
       axios.get(`http://localhost:5001/api/user/attending?userId=${auth0Id}`)
         .then(response => {
-          console.log("Fetched attending events:", response.data); // Log the fetched data
+          console.log("Fetched attending events:", response.data.attendingEvents); // Log the fetched data
           setAttendingEvents(response.data.attendingEvents || []);
         })
         .catch(error => console.error('Error fetching attending events:', error));
@@ -56,6 +67,34 @@ function EventsPage({ auth0Id }) {
   return (
     <div style={styles.container}>
       <h1 style={styles.header}>Upcoming Events</h1>
+
+      {/* Recommended Events */}
+      {recommendedEvents.length > 0 && (
+        <div>
+          <h2 style={styles.subHeader}>Recommended for You</h2>
+          <div style={styles.grid}>
+            {recommendedEvents.map(event => (
+              <div key={event._id} style={styles.card}>
+                <img src={event['pic-src']} alt={event.name} style={styles.image} />
+                <div style={styles.content}>
+                  <h2 style={styles.title}>{event.name}</h2>
+                  <p style={styles.detail}><strong>Location:</strong> {event.location}</p>
+                  <p style={styles.detail}><strong>Date:</strong> {event.date}</p>
+                  <button
+                    style={attendingEvents.includes(event._id) ? styles.buttonNotGoing : styles.buttonGoing}
+                    onClick={() => handleAttendEvent(event._id)}
+                  >
+                    {attendingEvents.includes(event._id) ? "I'm Not Going" : "I'm Going"}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* All Events */}
+      <h2 style={styles.subHeader}>All Events</h2>
       <div style={styles.grid}>
         {events.map(event => (
           <div key={event._id} style={styles.card}>
@@ -89,6 +128,10 @@ const styles = {
   header: {
     textAlign: 'center',
     marginBottom: '20px',
+  },
+  subHeader: {
+    marginBottom: '10px',
+    fontSize: '24px',
   },
   grid: {
     display: 'grid',
