@@ -5,6 +5,25 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Distribution / packaging
+*.egg-info
+dist/
+build/
+develop-eggs/
+.eggs/
+sdist/
+wheels/
+
+# Python environments
+.env
+venv/
+env/
+.venv/
+
+# IDE-specific files
+.idea/
+.vscode/
+
 # dependencies
 /node_modules
 /.pnp
