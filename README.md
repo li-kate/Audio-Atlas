@@ -39,5 +39,5 @@ make 3 terminals lolz
 **cd server**
 - node index.js
 
-**same file as src but not cd src hopefully you understand**
+**cd audio-atlas**
 - npm start
