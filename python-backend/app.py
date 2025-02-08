@@ -109,9 +109,53 @@ def get_attending_events():
         # Find the user and return their attendingEvents
         user = users_collection.find_one({"auth0Id": user_id}, {"attendingEvents": 1})
         if user:
-            return jsonify({"attendingEvents": user.get("attendingEvents", [])})
+            # Convert ObjectId to string for JSON serialization
+            attending_events = [str(event_id) for event_id in user.get("attendingEvents", [])]
+            return jsonify({"attendingEvents": attending_events})
         else:
             return jsonify({"attendingEvents": []})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/api/events/recommended", methods=["GET"])
+def get_recommended_events():
+    user_id = request.args.get("userId")
+
+    if not user_id:
+        return jsonify({"error": "Missing userId"}), 400
+
+    try:
+        # Find the current user's liked songs
+        user = users_collection.find_one({"auth0Id": user_id}, {"favoriteSongs": 1})
+        if not user or "favoriteSongs" not in user:
+            return jsonify({"recommendedEvents": []})
+
+        user_favorite_songs = set(user["favoriteSongs"])
+
+        # Find other users with similar liked songs
+        similar_users = users_collection.find(
+            {"favoriteSongs": {"$in": list(user_favorite_songs)}},
+            {"attendingEvents": 1}
+        )
+
+        # Collect events attended by similar users
+        recommended_events = set()
+        for similar_user in similar_users:
+            if "attendingEvents" in similar_user:
+                recommended_events.update(similar_user["attendingEvents"])
+
+        # Exclude events the user is already attending
+        if "attendingEvents" in user:
+            recommended_events -= set(user["attendingEvents"])
+
+        # Fetch details of recommended events
+        recommended_events = list(recommended_events)
+        events = events_collection.find({"_id": {"$in": recommended_events}})
+
+        # Convert ObjectId to string for JSON serialization
+        events = [{"_id": str(event["_id"]), **event} for event in events]
+
+        return jsonify({"recommendedEvents": events})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
