@@ -3,6 +3,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import SongSelection from './SongSelection';
+import DiverseSongs from './DiversePlaylist';
 
 function App() {
   const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
@@ -34,11 +35,13 @@ function App() {
             <nav>
               <Link to="/">Home</Link>
               <Link to="/songs">Song Selection</Link>
+              <Link to="/diverse-playlist">Create Diverse Playlist</Link>
             </nav>
           </div>
         )}
         <Routes>
           <Route path="/songs" element={<SongSelection auth0Id={user?.sub} />} />
+          <Route path="/diverse-songs" element={<DiverseSongs />} />
         </Routes>
       </div>
     </Router>

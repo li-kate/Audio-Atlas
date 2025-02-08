@@ -79,3 +79,20 @@ def get_user_songs():
     # Return the user's saved songs
     saved_songs = user.get("favoriteSongs", [])
     return jsonify(saved_songs), 200
+
+@song_routes.route("/user/songs/remove", methods=["POST"])
+def remove_user_songs():
+    data = request.json
+    auth0_id = data.get("auth0Id")
+    song_id = data.get("songId")
+
+    if not auth0_id or not song_id:
+        return jsonify({"error": "Missing required fields"}), 400
+
+    # Remove the song from the user's favorite songs
+    users_collection.update_one(
+        {"auth0Id": auth0_id},
+        {"$pull": {"favoriteSongs": {"spotify_id": song_id}}}
+    )
+
+    return jsonify({"message": "Song removed successfully"}), 200

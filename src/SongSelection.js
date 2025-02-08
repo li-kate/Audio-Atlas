@@ -43,6 +43,19 @@ function SongSelection({ auth0Id }) {
     }
   };
 
+  const removeSong = async (songId) => {
+    try {
+      await axios.post('http://localhost:5001/api/user/songs/remove', { auth0Id, songId });
+      // Refresh the saved songs list after removing
+      const response = await axios.get(`http://localhost:5001/api/user/songs?auth0Id=${auth0Id}`);
+      setSavedSongs(response.data);
+    } catch (error) {
+      console.error('Error removing song:', error);
+      alert('Failed to remove song. Check the console for details.');
+    }
+  };
+  
+
   return (
     <div>
       <h2>Song Selection</h2>
@@ -79,10 +92,11 @@ function SongSelection({ auth0Id }) {
       <h3>Saved Songs</h3>
       <ul>
         {savedSongs.map((song, index) => (
-          <li key={index}>
+            <li key={index}>
             <img src={song.image} alt={song.name} width="50" height="50" />
             {song.name} - {song.artist}
-          </li>
+            <button onClick={() => removeSong(song.spotify_id)}>Remove</button>
+            </li>
         ))}
       </ul>
     </div>
