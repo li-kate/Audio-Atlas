@@ -64,3 +64,18 @@ def save_user_songs():
     )
 
     return jsonify({"message": "Songs saved successfully"}), 200
+
+@song_routes.route("/user/songs", methods=["GET"])
+def get_user_songs():
+    auth0_id = request.args.get("auth0Id")
+    if not auth0_id:
+        return jsonify({"error": "auth0Id is required"}), 400
+
+    # Find the user in the database
+    user = users_collection.find_one({"auth0Id": auth0_id})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Return the user's saved songs
+    saved_songs = user.get("favoriteSongs", [])
+    return jsonify(saved_songs), 200
