@@ -1,11 +1,11 @@
 import React from 'react';
 
-function DiversePlaylist() {
+function DiverseSongs() {
   return (
     <div style={{ width: '100%', height: '100vh' }}>
       <iframe
         src="http://localhost:8501"
-        title="Diverse Playlist"
+        title="Diverse Songs"
         width="100%"
         height="100%"
         style={{ border: 'none' }}
@@ -14,4 +14,4 @@ function DiversePlaylist() {
   );
 }
 
-export default DiversePlaylist;
+export default DiverseSongs;
