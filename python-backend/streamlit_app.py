@@ -4,10 +4,14 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import StandardScaler
 import streamlit as st
 from pymongo import MongoClient
-
+import certifi
 # Connect to MongoDB Atlas
 def connect_to_mongodb(connection_string, db_name, collection_name):
-    client = MongoClient(connection_string)
+    client = MongoClient(
+        connection_string,
+        tls=True,
+        tlsCAFile=certifi.where()
+    )
     db = client[db_name]
     collection = db[collection_name]
     return collection
@@ -85,7 +89,7 @@ def main():
     st.write("Select 5 songs from the database to get personalized recommendations.")
 
     # MongoDB connection details
-    connection_string = "mongodb+srv://kli605:UT5EOcqJHiObp5Dp@firstcluster.2a3mg.mongodb.net/"  # Replace with your MongoDB Atlas connection string
+    connection_string = "mongodb+srv://kli605:UT5EOcqJHiObp5Dp@firstcluster.2a3mg.mongodb.net/?retryWrites=true&w=majority&tls=true"  # Replace with your MongoDB Atlas connection string
     db_name = "test"  # Replace with your database name
     collection_name = "songDatabase"  # Replace with your collection name
 
