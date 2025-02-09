@@ -4,7 +4,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import StandardScaler
 import streamlit as st
 from pymongo import MongoClient
-
+import certifi
 # Connect to MongoDB Atlas
 def connect_to_mongodb(connection_string, db_name, collection_name):
     client = MongoClient(
