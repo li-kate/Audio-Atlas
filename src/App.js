@@ -41,6 +41,7 @@ function App() {
               <Link to="/">Home</Link>
               <Link to="/songs">Song Selection</Link>
               <Link to="/events">Events</Link>
+              <Link to="http://localhost:8501/">Generate Playlist</Link>
               <Link to={`/profile/${user?.sub}`}>Public Profile</Link>
               <Link to="/settings">Settings</Link>
             </nav>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './SongSelection.css'; // Import the CSS file
 
 function SongSelection({ auth0Id }) {
   const [query, setQuery] = useState('');
@@ -37,6 +38,7 @@ function SongSelection({ auth0Id }) {
       // Refresh the saved songs list after saving
       const response = await axios.get(`http://localhost:5001/api/user/songs?auth0Id=${auth0Id}`);
       setSavedSongs(response.data);
+      setSelectedSongs([]); // Clear selected songs after saving
     } catch (error) {
       console.error('Error saving songs:', error);
       alert('Failed to save songs. Check the console for details.');
@@ -54,51 +56,73 @@ function SongSelection({ auth0Id }) {
       alert('Failed to remove song. Check the console for details.');
     }
   };
-  
 
   return (
-    <div>
-      <h2>Song Selection</h2>
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search for songs"
-      />
-      <button onClick={searchSongs}>Search</button>
+    <div className="song-selection-container">
+      <h2 className="header">Song Selection</h2>
 
-      <h3>Search Results</h3>
-      <ul>
+      {/* Search Bar */}
+      <div className="search-bar">
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search for songs"
+          className="search-input"
+        />
+        <button onClick={searchSongs} className="search-button">Search</button>
+      </div>
+
+      {/* Search Results */}
+      <h3 className="sub-header">Search Results</h3>
+      <div className="song-grid">
         {songs.map((song, index) => (
-          <li key={index}>
-            <img src={song.image} alt={song.name} width="50" height="50" />
-            {song.name} - {song.artist}
-            <button onClick={() => handleSelectSong(song)}>Select</button>
-          </li>
+          <div key={index} className="song-card">
+            <img src={song.image} alt={song.name} className="song-image" />
+            <div className="song-details">
+              <h4 className="song-title">{song.name}</h4>
+              <p className="song-artist">{song.artist}</p>
+              <button onClick={() => handleSelectSong(song)} className="select-button">
+                Select
+              </button>
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
 
-      <h3>Selected Songs</h3>
-      <ul>
+      {/* Selected Songs */}
+      <h3 className="sub-header">Selected Songs</h3>
+      <div className="song-grid">
         {selectedSongs.map((song, index) => (
-          <li key={index}>
-            <img src={song.image} alt={song.name} width="50" height="50" />
-            {song.name} - {song.artist}
-          </li>
+          <div key={index} className="song-card">
+            <img src={song.image} alt={song.name} className="song-image" />
+            <div className="song-details">
+              <h4 className="song-title">{song.name}</h4>
+              <p className="song-artist">{song.artist}</p>
+            </div>
+          </div>
         ))}
-      </ul>
-      <button onClick={saveSongs}>Save Songs</button>
+      </div>
+      {selectedSongs.length > 0 && (
+        <button onClick={saveSongs} className="save-button">Save Selected Songs</button>
+      )}
 
-      <h3>Saved Songs</h3>
-      <ul>
+      {/* Saved Songs */}
+      <h3 className="sub-header">Saved Songs</h3>
+      <div className="song-grid">
         {savedSongs.map((song, index) => (
-            <li key={index}>
-            <img src={song.image} alt={song.name} width="50" height="50" />
-            {song.name} - {song.artist}
-            <button onClick={() => removeSong(song.spotify_id)}>Remove</button>
-            </li>
+          <div key={index} className="song-card">
+            <img src={song.image} alt={song.name} className="song-image" />
+            <div className="song-details">
+              <h4 className="song-title">{song.name}</h4>
+              <p className="song-artist">{song.artist}</p>
+              <button onClick={() => removeSong(song.spotify_id)} className="remove-button">
+                Remove
+              </button>
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
