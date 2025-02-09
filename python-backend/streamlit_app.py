@@ -1,130 +1,70 @@
 import streamlit as st
-import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
-import os
-from dotenv import load_dotenv
-import pymongo
-import random
-import numpy as np
-from sklearn.cluster import KMeans
+import requests
+from collections import defaultdict
+import json
 
-load_dotenv()
+BACKEND_URL = "http://localhost:5001"  # Flask backend
 
-# Spotify API credentials
-client_id = os.getenv("SPOTIFY_CLIENT_ID")
-client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
+# Fetch user data
+def fetch_user_data(auth0_id):
+    response = requests.get(f"{BACKEND_URL}/api/user/profile", params={"auth0Id": auth0_id})
+    return response.json() if response.status_code == 200 else None
 
-# Authenticate with Spotify (no user login required)
-sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
-    client_id=client_id,
-    client_secret=client_secret
-))
+# Fetch all users
+def fetch_all_users():
+    response = requests.get(f"{BACKEND_URL}/api/users")
+    return response.json() if response.status_code == 200 else []
 
-# MongoDB 
-mongo_uri = os.getenv("MONGO_URI")
-client = pymongo.MongoClient(mongo_uri)
-db = client["test"]
-users_collection = db["users"]
+# Fetch all events
+def fetch_all_events():
+    response = requests.get(f"{BACKEND_URL}/api/events")
+    return response.json() if response.status_code == 200 else []
 
-# Streamlit app
-st.title("Discover Diverse Songs in Different Languages")
+# Recommend events
+def recommend_events(user_data, all_users, all_events):
+    if not user_data or "favoriteSongs" not in user_data:
+        return []
 
-# Fetch saved songs from MongoDB database for a specific user
-def get_saved_songs_from_db(auth0_id):
-    user = users_collection.find_one({"auth0Id": auth0_id})
-    if user and "favoriteSongs" in user:
-        return user["favoriteSongs"]  # Assuming favoriteSongs contains track IDs
-    return []
+    user_favorite_songs = set(user_data["favoriteSongs"])
+    user_attending_events = set(user_data.get("attendingEvents", []))
 
-# Get audio features for songs
-def get_audio_features(track_ids):
-    audio_features = []
-    for i in range(0, len(track_ids), 50):  # Spotify API allows 50 IDs per request
-        features = sp.audio_features(track_ids[i:i+50])
-        audio_features.extend(features)
-    return audio_features
+    similar_users = []
+    for user in all_users:
+        if user["auth0Id"] != user_data["auth0Id"] and "favoriteSongs" in user:
+            common_songs = set(user["favoriteSongs"]) & user_favorite_songs
+            if common_songs:
+                similar_users.append((user, len(common_songs)))
 
-# Cluster songs based on audio features
-def cluster_songs(audio_features, n_clusters=5):
-    features = np.array([[f["danceability"], f["energy"], f["valence"]] for f in audio_features])
-    kmeans = KMeans(n_clusters=n_clusters, random_state=42).fit(features)
-    return kmeans.labels_
+    similar_users.sort(key=lambda x: x[1], reverse=True)
 
-# Get the language of a track by analyzing the artist's country or metadata
-def get_track_language(track):
-    artist_country = track["artists"][0]["country"] if "country" in track["artists"][0] else "unknown"
-    return artist_country
+    recommended_events = defaultdict(int)
+    for user, _ in similar_users:
+        if "attendingEvents" in user:
+            for event_id in user["attendingEvents"]:
+                if event_id not in user_attending_events:
+                    recommended_events[event_id] += 1
 
-# Generate diverse recommendations based on saved songs, ensuring language diversity
-def generate_diverse_recommendations(saved_songs, n_recommendations=20):
-    track_ids = [song["spotify_id"] for song in saved_songs if "spotify_id" in song]
-    audio_features = get_audio_features(track_ids)
-    clusters = cluster_songs(audio_features)
+    sorted_events = sorted(recommended_events.items(), key=lambda x: x[1], reverse=True)
+    return [event_id for event_id, _ in sorted_events[:5]]
 
-    # Create a dictionary to store unique languages
-    language_dict = {}
-    recommendations = []
+# Fetch ranked attendees
+def fetch_attending_users(event_id, all_users, user_data):
+    attending_users = [
+        {"name": user.get("name", "Unknown"), "commonSongs": len(set(user.get("favoriteSongs", [])) & set(user_data.get("favoriteSongs", [])))}
+        for user in all_users if "attendingEvents" in user and event_id in user["attendingEvents"]
+    ]
+    return sorted(attending_users, key=lambda x: x["commonSongs"], reverse=True)
 
-    # Generate recommendations for each cluster
-    for cluster in np.unique(clusters):
-        # Get the saved songs in this cluster
-        seed_tracks = [track_ids[i] for i in range(len(track_ids)) if clusters[i] == cluster]
+# Streamlit API response
+query_params = st.experimental_get_query_params()
+auth0_id = query_params.get("userId", [None])[0]
+event_id = query_params.get("eventId", [None])[0]
 
-        # Recommend songs for this cluster
-        results = sp.recommendations(seed_tracks=seed_tracks, limit=n_recommendations // len(np.unique(clusters)))
-        for track in results['tracks']:
-            track_language = get_track_language(track)
+if auth0_id:
+    user_data = fetch_user_data(auth0_id)
+    recommended_events = recommend_events(user_data, fetch_all_users(), fetch_all_events())
+    st.json({"recommendedEvents": fetch_all_events()})
 
-            # Only select recommendations from languages that haven't been chosen yet
-            if track_language not in language_dict:
-                recommendations.append(track)
-                language_dict[track_language] = True
-
-            # Stop if we have enough recommendations
-            if len(recommendations) >= n_recommendations:
-                break
-        
-        # Stop if we have enough recommendations
-        if len(recommendations) >= n_recommendations:
-            break
-    
-    return recommendations
-
-# Save selected songs to user's library (only in the Streamlit interface, not Spotify)
-def save_songs(auth0_id, track_ids):
-    # Update the user's favoriteSongs in MongoDB
-    users_collection.update_one(
-        {"auth0Id": auth0_id},
-        {"$addToSet": {"favoriteSongs": {"$each": track_ids}}}
-    )
-    st.success(f"Saved {len(track_ids)} songs to your library!")
-
-# Main app logic
-auth0_id = st.text_input("Enter your Auth0 ID:")  # Allow user to input their Auth0 ID
-
-if st.button("Discover Diverse Songs in Different Languages"):
-    if not auth0_id:
-        st.error("Please enter your Auth0 ID.")
-    else:
-        saved_songs = get_saved_songs_from_db(auth0_id)
-        if not saved_songs:
-            st.error("No saved songs found in database. Add some songs first!")
-        else:
-            st.write("Generating diverse song recommendations...")
-
-            recommendations = generate_diverse_recommendations(saved_songs)
-
-            # Display recommended songs
-            st.write("### Recommended Diverse Songs")
-            selected_tracks = []
-            for track in recommendations:
-                st.write(f"**{track['name']}** by {track['artists'][0]['name']}")
-                st.image(track["album"]["images"][0]["url"], width=100)
-                if st.button(f"Select {track['name']}", key=track["id"]):
-                    selected_tracks.append(track["id"])
-                    st.success(f"Added {track['name']} to selected songs!")
-
-            # Save selected songs to MongoDB
-            if selected_tracks:
-                if st.button("Save Selected Songs"):
-                    save_songs(auth0_id, selected_tracks)
+if event_id:
+    attending_users = fetch_attending_users(event_id, fetch_all_users(), fetch_user_data(auth0_id))
+    st.json({"attendees": attending_users})
