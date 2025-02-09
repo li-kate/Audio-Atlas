@@ -3,8 +3,9 @@ import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import SongSelection from './SongSelection';
-import DiverseSongs from './DiversePlaylist';
 import EventsPage from './EventsPage';
+import ProfilePage from './ProfilePage';
+import SettingsPage from './SettingsPage';
 
 function App() {
   const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
@@ -36,15 +37,17 @@ function App() {
             <nav>
               <Link to="/">Home</Link>
               <Link to="/songs">Song Selection</Link>
-              <Link to="/diverse-playlist">Create Diverse Playlist</Link>
               <Link to="/events">Events</Link>
+              <Link to="/profile">Public Profile</Link>
+              <Link to="/settings">Settings</Link>
             </nav>
           </div>
         )}
         <Routes>
           <Route path="/songs" element={<SongSelection auth0Id={user?.sub} />} />
-          <Route path="/diverse-songs" element={<DiverseSongs />} />
           <Route path="/events" element={<EventsPage auth0Id={user?.sub} />} />
+          <Route path="/profile" element={<ProfilePage auth0Id={user?.sub} />} />
+          <Route path="/settings" element={<SettingsPage auth0Id={user?.sub} />} />
         </Routes>
       </div>
     </Router>
