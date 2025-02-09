@@ -20,7 +20,7 @@ if not mongo_uri:
 
 client = MongoClient(mongo_uri)
 db = client["test"]
-events_collection = db["athensEvents"]
+events_collection = db["athensEvents1"]
 users_collection = db["users"]
 
 # Import routes
