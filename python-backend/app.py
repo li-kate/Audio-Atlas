@@ -191,7 +191,7 @@ def get_profile():
             "name": user.get("name", "Unknown User"),
             "savedSongs": user.get("favoriteSongs", []) if settings.get("showSongs", True) else [],
             "attendingEvents": [str(event_id) for event_id in user.get("attendingEvents", [])] if settings.get("showEvents", True) else [],
-            "contactLink": user.get("contactLink", "") if settings.get("showContact", True) else "",
+            "contactLink": settings.get("contactLink", ""), 
             "settings": settings  # Include settings in the response
         }
 
