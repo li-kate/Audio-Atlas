@@ -118,59 +118,59 @@ def get_attending_events():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-@app.route("/api/events/recommended", methods=["GET"])
-def get_recommended_events():
-    user_id = request.args.get("userId")
+# @app.route("/api/events/recommended", methods=["GET"])
+# def get_recommended_events():
+#     user_id = request.args.get("userId")
 
-    if not user_id:
-        return jsonify({"error": "Missing userId"}), 400
+#     if not user_id:
+#         return jsonify({"error": "Missing userId"}), 400
 
-    try:
-        print("Fetching recommended events for user:", user_id)  # Log the userId
+#     try:
+#         print("Fetching recommended events for user:", user_id)  # Log the userId
 
-        # Find the current user's liked songs
-        user = users_collection.find_one({"auth0Id": user_id}, {"favoriteSongs": 1})
-        if not user:
-            print("User not found")  # Log if user is not found
-            return jsonify({"recommendedEvents": []})
-        if "favoriteSongs" not in user:
-            print("User has no favorite songs")  # Log if user has no favorite songs
-            return jsonify({"recommendedEvents": []})
+#         # Find the current user's liked songs
+#         user = users_collection.find_one({"auth0Id": user_id}, {"favoriteSongs": 1})
+#         if not user:
+#             print("User not found")  # Log if user is not found
+#             return jsonify({"recommendedEvents": []})
+#         if "favoriteSongs" not in user:
+#             print("User has no favorite songs")  # Log if user has no favorite songs
+#             return jsonify({"recommendedEvents": []})
 
-        user_favorite_songs = set(user["favoriteSongs"])
-        print("User's favorite songs:", user_favorite_songs)  # Log the user's favorite songs
+#         user_favorite_songs = set(user["favoriteSongs"])
+#         print("User's favorite songs:", user_favorite_songs)  # Log the user's favorite songs
 
-        # Find other users with similar liked songs
-        similar_users = users_collection.find(
-            {"favoriteSongs": {"$in": list(user_favorite_songs)}},
-            {"attendingEvents": 1}
-        )
+#         # Find other users with similar liked songs
+#         similar_users = users_collection.find(
+#             {"favoriteSongs": {"$in": list(user_favorite_songs)}},
+#             {"attendingEvents": 1}
+#         )
 
-        # Collect events attended by similar users
-        recommended_events = set()
-        for similar_user in similar_users:
-            if "attendingEvents" in similar_user:
-                print("Similar user's attending events:", similar_user["attendingEvents"])  # Log attending events
-                recommended_events.update(similar_user["attendingEvents"])
+#         # Collect events attended by similar users
+#         recommended_events = set()
+#         for similar_user in similar_users:
+#             if "attendingEvents" in similar_user:
+#                 print("Similar user's attending events:", similar_user["attendingEvents"])  # Log attending events
+#                 recommended_events.update(similar_user["attendingEvents"])
 
-        # Exclude events the user is already attending
-        if "attendingEvents" in user:
-            recommended_events -= set(user["attendingEvents"])
+#         # Exclude events the user is already attending
+#         if "attendingEvents" in user:
+#             recommended_events -= set(user["attendingEvents"])
 
-        print("Recommended events before fetching details:", recommended_events)  # Log recommended events
+#         print("Recommended events before fetching details:", recommended_events)  # Log recommended events
 
-        # Fetch details of recommended events
-        recommended_events = list(recommended_events)
-        events = list(events_collection.find({"_id": {"$in": [ObjectId(event_id) for event_id in recommended_events]}}))
+#         # Fetch details of recommended events
+#         recommended_events = list(recommended_events)
+#         events = list(events_collection.find({"_id": {"$in": [ObjectId(event_id) for event_id in recommended_events]}}))
 
-        # Convert ObjectId to string for JSON serialization
-        events = [{"_id": str(event["_id"]), **event} for event in events]
+#         # Convert ObjectId to string for JSON serialization
+#         events = [{"_id": str(event["_id"]), **event} for event in events]
 
-        print("Final recommended events:", events)  # Log final recommended events
-        return jsonify({"recommendedEvents": events})
-    except Exception as e:
-        print("Error in /api/events/recommended:", str(e))  # Log the error
-        return jsonify({"error": str(e)}), 500
+#         print("Final recommended events:", events)  # Log final recommended events
+#         return jsonify({"recommendedEvents": events})
+#     except Exception as e:
+#         print("Error in /api/events/recommended:", str(e))  # Log the error
+#         return jsonify({"error": str(e)}), 500
     
 # Define the /user/profile route directly in app.py
 @app.route("/api/user/profile", methods=["GET"])
