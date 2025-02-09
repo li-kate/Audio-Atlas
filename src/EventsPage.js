@@ -23,7 +23,10 @@ function EventsPage({ auth0Id }) {
           console.log("Fetched recommended events:", response.data.recommendedEvents); // Log the fetched data
           setRecommendedEvents(response.data.recommendedEvents || []);
         })
-        .catch(error => console.error('Error fetching recommended events:', error));
+        .catch(error => {
+          console.error('Error fetching recommended events:', error);
+          alert('Failed to fetch recommended events. Check the console for details.');
+        });
     }
 
     // Fetch user's attending events

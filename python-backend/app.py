@@ -3,6 +3,7 @@ from flask_cors import CORS
 from pymongo import MongoClient
 from dotenv import load_dotenv
 from bson.objectid import ObjectId
+from bson.json_util import dumps
 import os
 
 # Load environment variables
@@ -125,12 +126,19 @@ def get_recommended_events():
         return jsonify({"error": "Missing userId"}), 400
 
     try:
+        print("Fetching recommended events for user:", user_id)  # Log the userId
+
         # Find the current user's liked songs
         user = users_collection.find_one({"auth0Id": user_id}, {"favoriteSongs": 1})
-        if not user or "favoriteSongs" not in user:
+        if not user:
+            print("User not found")  # Log if user is not found
+            return jsonify({"recommendedEvents": []})
+        if "favoriteSongs" not in user:
+            print("User has no favorite songs")  # Log if user has no favorite songs
             return jsonify({"recommendedEvents": []})
 
         user_favorite_songs = set(user["favoriteSongs"])
+        print("User's favorite songs:", user_favorite_songs)  # Log the user's favorite songs
 
         # Find other users with similar liked songs
         similar_users = users_collection.find(
@@ -142,21 +150,94 @@ def get_recommended_events():
         recommended_events = set()
         for similar_user in similar_users:
             if "attendingEvents" in similar_user:
+                print("Similar user's attending events:", similar_user["attendingEvents"])  # Log attending events
                 recommended_events.update(similar_user["attendingEvents"])
 
         # Exclude events the user is already attending
         if "attendingEvents" in user:
             recommended_events -= set(user["attendingEvents"])
 
+        print("Recommended events before fetching details:", recommended_events)  # Log recommended events
+
         # Fetch details of recommended events
         recommended_events = list(recommended_events)
-        events = events_collection.find({"_id": {"$in": recommended_events}})
+        events = list(events_collection.find({"_id": {"$in": [ObjectId(event_id) for event_id in recommended_events]}}))
 
         # Convert ObjectId to string for JSON serialization
         events = [{"_id": str(event["_id"]), **event} for event in events]
 
+        print("Final recommended events:", events)  # Log final recommended events
         return jsonify({"recommendedEvents": events})
     except Exception as e:
+        print("Error in /api/events/recommended:", str(e))  # Log the error
+        return jsonify({"error": str(e)}), 500
+    
+# Define the /user/profile route directly in app.py
+@app.route("/api/user/profile", methods=["GET"])
+def get_profile():
+    auth0_id = request.args.get("auth0Id")
+    print(f"Fetching profile for auth0Id: {auth0_id}")  # Debug log
+    if not auth0_id:
+        return jsonify({"error": "auth0Id is required"}), 400
+
+    try:
+        user = users_collection.find_one({"auth0Id": auth0_id})
+        print(f"User found: {user}")  # Debug log
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        settings = user.get("settings", {})
+        profile_data = {
+            "name": user.get("name", "Unknown User"),
+            "savedSongs": user.get("favoriteSongs", []) if settings.get("showSongs", True) else [],
+            "attendingEvents": [str(event_id) for event_id in user.get("attendingEvents", [])] if settings.get("showEvents", True) else [],
+            "contactLink": user.get("contactLink", "") if settings.get("showContact", True) else "",
+            "settings": settings  # Include settings in the response
+        }
+
+        return jsonify(profile_data), 200
+    except Exception as e:
+        print(f"Error: {str(e)}")  # Debug log
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/api/user/settings", methods=["POST"])
+def update_settings():
+    data = request.json
+    auth0_id = data.get("auth0Id")
+    settings = data.get("settings", {})
+
+    if not auth0_id:
+        return jsonify({"error": "auth0Id is required"}), 400
+
+    try:
+        users_collection.update_one(
+            {"auth0Id": auth0_id},
+            {"$set": {"settings": settings}}
+        )
+        return jsonify({"message": "Settings updated successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/api/events/details", methods=["POST"])
+def get_event_details():
+    data = request.json
+    event_ids = data.get("eventIds", [])
+    print(f"Fetching details for event IDs: {event_ids}")  # Debug log
+
+    try:
+        # Convert event IDs to ObjectId
+        event_ids = [ObjectId(event_id) for event_id in event_ids]
+
+        # Fetch event details
+        events = list(events_collection.find({"_id": {"$in": event_ids}}))
+
+        # Convert ObjectId to string for JSON serialization
+        for event in events:
+            event["_id"] = str(event["_id"])
+
+        return jsonify(events), 200
+    except Exception as e:
+        print(f"Error: {str(e)}")  # Debug log
         return jsonify({"error": str(e)}), 500
 
 # Run the app
