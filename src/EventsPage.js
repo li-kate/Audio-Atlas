@@ -152,14 +152,14 @@ function EventsPage({ auth0Id }) {
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
             <h2>Attendees</h2>
-            <ul>
+            <ul style={{ listStyleType: 'none', padding: 0 }}>
               {attendees.map((attendee, index) => (
-                <li key={index}>
+                <li key={index} style={{ textAlign: 'center', margin: '10px 0' }}>
                   <strong>
                     <Link to={`/profile/${attendee.auth0Id}`} style={styles.profileLink}>
-                        {attendee.name} 
+                      {attendee.name}
                     </Link>
-                  </strong> 
+                  </strong>
                   {/* - Top Songs: {attendee.topSongs.join(', ')} */}
                 </li>
               ))}
