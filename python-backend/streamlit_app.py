@@ -89,7 +89,7 @@ def main():
     st.write("Select 5 songs from the database to get personalized recommendations.")
 
     # MongoDB connection details
-    connection_string = "mongodb+srv://kli605:UT5EOcqJHiObp5Dp@firstcluster.2a3mg.mongodb.net/?ssl=true"  # Replace with your MongoDB Atlas connection string
+    connection_string = "mongodb+srv://kli605:UT5EOcqJHiObp5Dp@firstcluster.2a3mg.mongodb.net/?retryWrites=true&w=majority&tls=true"  # Replace with your MongoDB Atlas connection string
     db_name = "test"  # Replace with your database name
     collection_name = "songDatabase"  # Replace with your collection name
 
