@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './SettingsPage.css'; // Import the CSS file
 
 const SettingsPage = ({ auth0Id }) => {
     const [settings, setSettings] = useState({
@@ -51,25 +52,57 @@ const SettingsPage = ({ auth0Id }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <label>
-                Show Songs:
-                <input type="checkbox" name="showSongs" checked={settings.showSongs} onChange={handleChange} />
-            </label>
-            <label>
-                Show Events:
-                <input type="checkbox" name="showEvents" checked={settings.showEvents} onChange={handleChange} />
-            </label>
-            <label>
-                Show Contact Link:
-                <input type="checkbox" name="showContact" checked={settings.showContact} onChange={handleChange} />
-            </label>
-            <label>
-                Contact Link:
-                <input type="text" name="contactLink" value={settings.contactLink} onChange={handleChange} />
-            </label>
-            <button type="submit">Save Settings</button>
-        </form>
+        <div className="settings-container">
+            <h2>Settings</h2>
+            <form onSubmit={handleSubmit} className="settings-form">
+                <div className="form-group">
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="showSongs"
+                            checked={settings.showSongs}
+                            onChange={handleChange}
+                        />
+                        Show Songs
+                    </label>
+                </div>
+                <div className="form-group">
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="showEvents"
+                            checked={settings.showEvents}
+                            onChange={handleChange}
+                        />
+                        Show Events
+                    </label>
+                </div>
+                <div className="form-group">
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="showContact"
+                            checked={settings.showContact}
+                            onChange={handleChange}
+                        />
+                        Show Contact Link
+                    </label>
+                </div>
+                <div className="form-group">
+                    <label>
+                        Contact Link:
+                        <input
+                            type="text"
+                            name="contactLink"
+                            value={settings.contactLink}
+                            onChange={handleChange}
+                            placeholder="Enter your contact link"
+                        />
+                    </label>
+                </div>
+                <button type="submit" className="save-button">Save Settings</button>
+            </form>
+        </div>
     );
 };
 

@@ -20,18 +20,18 @@ function EventsPage({ auth0Id }) {
       })
       .catch(error => console.error('Error fetching events:', error));
 
-    // Fetch recommended events
-    if (auth0Id) {
-      axios.get(`http://localhost:5001/api/events/recommended?userId=${auth0Id}`)
-        .then(response => {
-          console.log("Fetched recommended events:", response.data.recommendedEvents);
-          setRecommendedEvents(response.data.recommendedEvents || []);
-        })
-        .catch(error => {
-          console.error('Error fetching recommended events:', error);
-          alert('Failed to fetch recommended events. Check the console for details.');
-        });
-    }
+    // // Fetch recommended events
+    // if (auth0Id) {
+    //   axios.get(`http://localhost:5001/api/events/recommended?userId=${auth0Id}`)
+    //     .then(response => {
+    //       console.log("Fetched recommended events:", response.data.recommendedEvents);
+    //       setRecommendedEvents(response.data.recommendedEvents || []);
+    //     })
+    //     .catch(error => {
+    //       console.error('Error fetching recommended events:', error);
+    //       alert('Failed to fetch recommended events. Check the console for details.');
+    //     });
+    // }
 
     // Fetch user's attending events
     if (auth0Id) {
@@ -89,7 +89,7 @@ function EventsPage({ auth0Id }) {
     <div style={styles.container}>
       <h1 style={styles.header}>Upcoming Events</h1>
 
-      {/* Recommended Events */}
+      {/* Recommended Events
       {recommendedEvents.length > 0 && (
         <div>
           <h2 style={styles.subHeader}>Recommended for You</h2>
@@ -118,7 +118,7 @@ function EventsPage({ auth0Id }) {
             ))}
           </div>
         </div>
-      )}
+      )} */}
 
       {/* All Events */}
       <h2 style={styles.subHeader}>All Events</h2>
