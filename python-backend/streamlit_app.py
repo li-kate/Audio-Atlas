@@ -3,12 +3,19 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import StandardScaler
 import streamlit as st
+from pymongo import MongoClient
 
-# Load merged song data
-combined_data = pd.read_csv("C:/Users/Janhavi/PycharmProjects/personal1/combined_songs.csv")
+# Connect to MongoDB Atlas
+def connect_to_mongodb(connection_string, db_name, collection_name):
+    client = MongoClient(connection_string)
+    db = client[db_name]
+    collection = db[collection_name]
+    return collection
 
-# Drop unnecessary columns (modify if needed)
-combined_data = combined_data.drop(columns=["Unnamed: 0"], errors="ignore")
+# Load data from MongoDB
+def load_data_from_mongodb(collection):
+    data = list(collection.find({}))
+    return pd.DataFrame(data)
 
 # Function to score user's favorite songs
 def score_user_songs(user_songs, combined_data, feature_columns):
@@ -76,6 +83,22 @@ def recommend_songs(user_songs, combined_data, num_recommendations=5):
 def main():
     st.title("🎵 Song Recommendation System")
     st.write("Select 5 songs from the database to get personalized recommendations.")
+
+    # MongoDB connection details
+    connection_string = "mongodb+srv://kli605:UT5EOcqJHiObp5Dp@firstcluster.2a3mg.mongodb.net/"  # Replace with your MongoDB Atlas connection string
+    db_name = "test"  # Replace with your database name
+    collection_name = "songDatabase"  # Replace with your collection name
+
+    # Connect to MongoDB and load data
+    collection = connect_to_mongodb(connection_string, db_name, collection_name)
+    combined_data = load_data_from_mongodb(collection)
+
+    # Drop unnecessary columns (modify if needed)
+    combined_data = combined_data.drop(columns=["_id", "Unnamed: 0"], errors="ignore")
+
+    # Ensure 'title' and 'artist' columns are treated as strings
+    combined_data["title"] = combined_data["title"].astype(str)
+    combined_data["artist"] = combined_data["artist"].astype(str)
 
     # Prepare song selection with artist names
     combined_data["song_with_artist"] = combined_data["title"] + " - " + combined_data["artist"]
