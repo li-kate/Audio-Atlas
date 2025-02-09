@@ -38,7 +38,7 @@ function App() {
               <Link to="/">Home</Link>
               <Link to="/songs">Song Selection</Link>
               <Link to="/events">Events</Link>
-              <Link to="/profile">Public Profile</Link>
+              <Link to={`/profile/${user?.sub}`}>Public Profile</Link>
               <Link to="/settings">Settings</Link>
             </nav>
           </div>
@@ -46,7 +46,7 @@ function App() {
         <Routes>
           <Route path="/songs" element={<SongSelection auth0Id={user?.sub} />} />
           <Route path="/events" element={<EventsPage auth0Id={user?.sub} />} />
-          <Route path="/profile" element={<ProfilePage auth0Id={user?.sub} />} />
+          <Route path="/profile/:auth0Id" element={<ProfilePage />} />
           <Route path="/settings" element={<SettingsPage auth0Id={user?.sub} />} />
         </Routes>
       </div>

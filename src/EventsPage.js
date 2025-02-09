@@ -159,7 +159,8 @@ function EventsPage({ auth0Id }) {
                     <Link to={`/profile/${attendee.auth0Id}`} style={styles.profileLink}>
                         {attendee.name} 
                     </Link>
-                  </strong> - Top Songs: {attendee.topSongs.join(', ')}
+                  </strong> 
+                  {/* - Top Songs: {attendee.topSongs.join(', ')} */}
                 </li>
               ))}
             </ul>
