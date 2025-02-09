@@ -11,7 +11,7 @@ load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
 
 # Connect to MongoDB
 mongo_uri = os.getenv("MONGO_URI")
@@ -238,6 +238,42 @@ def get_event_details():
         return jsonify(events), 200
     except Exception as e:
         print(f"Error: {str(e)}")  # Debug log
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/api/events/attendees", methods=["GET"])
+def get_event_attendees():
+    event_id = request.args.get("eventId")
+    user_id = request.args.get("userId")  # Exclude the current user
+
+    if not event_id:
+        return jsonify({"error": "Missing eventId"}), 400
+
+    try:
+        # Convert eventId to ObjectId
+        event_id = ObjectId(event_id)
+
+        # Find users who are attending the event, excluding the current user
+        query = {"attendingEvents": event_id}
+        if user_id:
+            query["auth0Id"] = {"$ne": user_id}  # Exclude the current user
+
+        attendees = users_collection.find(
+            query,
+            {"name": 1, "favoriteSongs": 1, "auth0Id": 1}  # Include auth0Id for profile links
+        )
+
+        # Format the response
+        attendees_list = []
+        for attendee in attendees:
+            attendees_list.append({
+                "name": attendee.get("name", "Anonymous"),
+                "topSongs": attendee.get("favoriteSongs", [])[:5],  # Top 5 songs
+                "auth0Id": attendee["auth0Id"]  # Include auth0Id for profile links
+            })
+
+        return jsonify({"attendees": attendees_list}), 200
+    except Exception as e:
+        print("Error:", str(e))  # Log the error
         return jsonify({"error": str(e)}), 500
 
 # Run the app
