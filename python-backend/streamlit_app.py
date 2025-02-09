@@ -1,70 +1,142 @@
+import pandas as pd
+import numpy as np
+from pymongo import MongoClient
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import StandardScaler
 import streamlit as st
-import requests
-from collections import defaultdict
-import json
 
-BACKEND_URL = "http://localhost:5001"  # Flask backend
+# MongoDB Atlas Connection
+MONGO_URI = "mongodb+srv://kli605:UT5EOcqJHiObp5Dp@firstcluster.2a3mg.mongodb.net/"
+client = MongoClient(MONGO_URI)
+db = client["test"]  # Replace with actual database name
+users_collection = db["users"]  # Collection storing users and saved songs
 
-# Fetch user data
-def fetch_user_data(auth0_id):
-    response = requests.get(f"{BACKEND_URL}/api/user/profile", params={"auth0Id": auth0_id})
-    return response.json() if response.status_code == 200 else None
+# Load merged song data
+combined_data = pd.read_csv("C:/Users/Janhavi/PycharmProjects/personal1/combined_songs.csv")
 
-# Fetch all users
-def fetch_all_users():
-    response = requests.get(f"{BACKEND_URL}/api/users")
-    return response.json() if response.status_code == 200 else []
+# Drop unnecessary columns (modify if needed)
+combined_data = combined_data.drop(columns=["Unnamed: 0"], errors="ignore")
 
-# Fetch all events
-def fetch_all_events():
-    response = requests.get(f"{BACKEND_URL}/api/events")
-    return response.json() if response.status_code == 200 else []
+# Function to get user-saved songs from MongoDB
+def get_saved_songs_from_db(auth0_id):
+    user = users_collection.find_one({"auth0Id": auth0_id})
+    if user:
+        if "favoriteSongs" in user:
+            return user["favoriteSongs"]  # Assuming favoriteSongs contains track titles
+    return []
 
-# Recommend events
-def recommend_events(user_data, all_users, all_events):
-    if not user_data or "favoriteSongs" not in user_data:
-        return []
+# Function to score user's favorite songs
+def score_user_songs(user_songs, combined_data, feature_columns):
+    scores = []
+    for song in user_songs:
+        song_title = song.get("name")  # Use "name" or "title"
+        if not song_title:
+            continue
 
-    user_favorite_songs = set(user_data["favoriteSongs"])
-    user_attending_events = set(user_data.get("attendingEvents", []))
+        # Find the audio features of the user's liked song
+        user_song_features = combined_data[combined_data["title"] == song_title][feature_columns]
+        if user_song_features.empty:
+            continue  # Skip if the song is not found in the dataset
 
-    similar_users = []
-    for user in all_users:
-        if user["auth0Id"] != user_data["auth0Id"] and "favoriteSongs" in user:
-            common_songs = set(user["favoriteSongs"]) & user_favorite_songs
-            if common_songs:
-                similar_users.append((user, len(common_songs)))
+        user_song_features = user_song_features.iloc[0].values
+        scores.append(user_song_features)
 
-    similar_users.sort(key=lambda x: x[1], reverse=True)
+    if scores:
+        return np.mean(scores, axis=0)  # Return average feature scores
+    else:
+        return None
 
-    recommended_events = defaultdict(int)
-    for user, _ in similar_users:
-        if "attendingEvents" in user:
-            for event_id in user["attendingEvents"]:
-                if event_id not in user_attending_events:
-                    recommended_events[event_id] += 1
+# Function to recommend songs based on audio features
+def recommend_songs(user_songs, combined_data, num_recommendations=5):
+    recommendations = []  # Store recommendations as a list of tuples (score, song details)
 
-    sorted_events = sorted(recommended_events.items(), key=lambda x: x[1], reverse=True)
-    return [event_id for event_id, _ in sorted_events[:5]]
+    # Sample 10000 random songs from the combined_data (no fixed random state)
+    random_songs = combined_data.sample(n=10000)
 
-# Fetch ranked attendees
-def fetch_attending_users(event_id, all_users, user_data):
-    attending_users = [
-        {"name": user.get("name", "Unknown"), "commonSongs": len(set(user.get("favoriteSongs", [])) & set(user_data.get("favoriteSongs", [])))}
-        for user in all_users if "attendingEvents" in user and event_id in user["attendingEvents"]
+    # Normalize the additional features
+    feature_columns = [
+        'danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness',
+        'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo'
     ]
-    return sorted(attending_users, key=lambda x: x["commonSongs"], reverse=True)
+    scaler = StandardScaler()
+    random_songs[feature_columns] = scaler.fit_transform(random_songs[feature_columns])
 
-# Streamlit API response
-query_params = st.experimental_get_query_params()
-auth0_id = query_params.get("userId", [None])[0]
-event_id = query_params.get("eventId", [None])[0]
+    # Score user's favorite songs
+    user_song_scores = score_user_songs(user_songs, combined_data, feature_columns)
 
-if auth0_id:
-    user_data = fetch_user_data(auth0_id)
-    recommended_events = recommend_events(user_data, fetch_all_users(), fetch_all_events())
-    st.json({"recommendedEvents": fetch_all_events()})
+    if user_song_scores is None:
+        return [], None  # Return empty list if no user song scores are available
 
-if event_id:
-    attending_users = fetch_attending_users(event_id, fetch_all_users(), fetch_user_data(auth0_id))
-    st.json({"attendees": attending_users})
+    # Calculate cosine similarity between the user's average scores and all candidate songs
+    similarities = cosine_similarity(
+        [user_song_scores], random_songs[feature_columns].values
+    )
+
+    # Add candidate songs to recommendations with their similarity scores
+    for idx, score in enumerate(similarities[0]):
+        similar_song = random_songs.iloc[idx]
+        recommendations.append((
+            score,
+            similar_song["title"],
+            similar_song["artist"],
+            similar_song["language"],
+            similar_song["track_id"],
+            similar_song[feature_columns].values  # Get the features of the recommended song
+        ))
+
+    # Sort recommendations by similarity score (highest first)
+    recommendations.sort(key=lambda x: x[0], reverse=True)
+
+    # Filter recommendations to include 3 songs in different languages and 2 in English
+    unique_recommendations = []
+    english_songs = []
+    other_language_songs = []
+    seen = set()
+
+    for rec in recommendations:
+        if rec[1] not in seen:  # Check if the song title is already in the recommendations
+            seen.add(rec[1])
+            if rec[3] == "en" and len(english_songs) < 2:
+                english_songs.append(rec)
+            elif rec[3] != "en" and len(other_language_songs) < 3:
+                other_language_songs.append(rec)
+            if len(english_songs) == 2 and len(other_language_songs) == 3:
+                break
+
+    unique_recommendations = english_songs + other_language_songs
+    return unique_recommendations, user_song_scores
+
+# Streamlit App
+def main():
+    st.title("🎵 Song Recommendation System")
+    st.write("Enter your Auth0 ID to get personalized song recommendations.")
+
+    # Input for Auth0 ID
+    auth0_id = st.text_input("Enter your Auth0 ID:")
+
+    if auth0_id:
+        st.write(f"Fetching recommendations for user: {auth0_id}")
+
+        # Get user's saved songs
+        user_songs = get_saved_songs_from_db(auth0_id)
+        if not user_songs:
+            st.warning("No saved songs found for this user.")
+        else:
+            st.write("### Your Saved Songs:")
+            for song in user_songs:
+                st.write(f"- {song.get('name')} ({song.get('language', 'Unknown')})")
+
+            # Generate recommendations
+            st.write("### Generating recommendations based on audio features...")
+            recommended_songs, _ = recommend_songs(user_songs, combined_data, num_recommendations=5)
+
+            if recommended_songs:
+                st.write("### Recommended Songs:")
+                for _, title, artist, language, _, _ in recommended_songs:
+                    st.write(f"- **{title}** by {artist} [{language}]")
+            else:
+                st.warning("No recommendations found. Check if data matches user's saved songs.")
+
+# Run the Streamlit app
+if __name__ == "__main__":
+    main()
