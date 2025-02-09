@@ -1,0 +1,188 @@
+.songSelectionContainer {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  justify-content: start;
+}
+
+.songSelectionWrapper {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+
+@media (max-width: 991px) {
+  .songSelectionWrapper {
+    max-width: 100%;
+  }
+}
+
+.heroSection {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 957px;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 366px 80px;
+}
+
+@media (max-width: 991px) {
+  .heroSection {
+    max-width: 100%;
+    padding: 100px 20px;
+  }
+}
+
+.backgroundImage {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.contentWrapper {
+  position: relative;
+  display: flex;
+  margin-bottom: -67px;
+  width: 644px;
+  max-width: 100%;
+  flex-direction: column;
+}
+
+@media (max-width: 991px) {
+  .contentWrapper {
+    margin-bottom: 10px;
+  }
+}
+
+.textContent {
+  align-self: end;
+  display: flex;
+  margin-right: 38px;
+  width: 483px;
+  max-width: 100%;
+  flex-direction: column;
+  font-family: Inter, sans-serif;
+  color: rgba(255, 255, 255, 1);
+  text-align: center;
+}
+
+@media (max-width: 991px) {
+  .textContent {
+    margin-right: 10px;
+  }
+}
+
+.mainTitle {
+  font-size: 60px;
+  font-weight: 900;
+  align-self: start;
+}
+
+@media (max-width: 991px) {
+  .mainTitle {
+    max-width: 100%;
+    font-size: 40px;
+  }
+}
+
+.subtitle {
+  font-size: 24px;
+  font-weight: 400;
+  align-self: end;
+  margin-top: 20px;
+}
+
+@media (max-width: 991px) {
+  .subtitle {
+    max-width: 100%;
+  }
+}
+
+.inputContainer {
+  display: flex;
+  margin-top: 49px;
+  gap: 40px 61px;
+  font-size: 16px;
+  font-weight: 400;
+  white-space: nowrap;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 991px) {
+  .inputContainer {
+    max-width: 100%;
+    margin-top: 40px;
+    white-space: initial;
+  }
+}
+
+.locationInput {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  aspect-ratio: 6.926;
+  width: fit-content;
+  font-family: Poppins, sans-serif;
+  color: rgba(60, 60, 60, 0.42);
+  flex-grow: 1;
+  padding: 15px 30px;
+}
+
+@media (max-width: 991px) {
+  .locationInput {
+    white-space: initial;
+    padding: 0 20px;
+  }
+}
+
+.searchButton {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  aspect-ratio: 3.833;
+  width: 207px;
+  font-family: Inter, sans-serif;
+  color: rgba(255, 255, 255, 1);
+  text-align: center;
+  justify-content: center;
+  padding: 1px 0;
+}
+
+@media (max-width: 991px) {
+  .searchButton {
+    white-space: initial;
+  }
+}
+
+.searchButtonInner {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  aspect-ratio: 3.906;
+  width: 100%;
+  padding: 17px 70px;
+}
+
+@media (max-width: 991px) {
+  .searchButtonInner {
+    white-space: initial;
+    padding: 0 20px;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

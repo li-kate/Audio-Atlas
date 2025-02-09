@@ -1,0 +1,89 @@
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 957px;
+  width: 100%;
+  align-items: center;
+  padding: 49px 80px 94px;
+}
+
+@media (max-width: 991px) {
+  .contentWrapper {
+    max-width: 100%;
+    padding: 0 20px;
+  }
+}
+
+.backgroundImage {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.contentContainer {
+  position: relative;
+  display: flex;
+  width: 1263px;
+  max-width: 100%;
+  flex-direction: column;
+}
+
+.title {
+  color: rgba(255, 255, 255, 1);
+  text-align: center;
+  align-self: center;
+  font: 900 60px Inter, sans-serif;
+}
+
+@media (max-width: 991px) {
+  .title {
+    font-size: 40px;
+  }
+}
+
+.description {
+  color: rgba(255, 255, 255, 1);
+  text-align: center;
+  align-self: center;
+  font: 400 24px Inter, sans-serif;
+}
+
+@media (max-width: 991px) {
+  .description {
+    max-width: 100%;
+  }
+}
+
+.songGrid {
+  display: flex;
+  margin-top: 105px;
+  gap: 13px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 991px) {
+  .songGrid {
+    margin-top: 40px;
+  }
+}
+
+.songImage {
+  aspect-ratio: 1.05;
+  object-fit: contain;
+  object-position: center;
+  width: 242px;
+  max-width: 100%;
+}
+
+.songImage:first-child {
+  width: 243px;
+}

@@ -1,0 +1,193 @@
+.landingPageFrame {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.landingPage {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  justify-content: flex-start;
+}
+
+.clipPathGroup {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 1064px;
+  width: 100%;
+  padding: 28px 79px 0;
+}
+
+.backgroundImage {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.navigationMenu {
+  position: relative;
+  align-self: center;
+  display: flex;
+  width: 705px;
+  max-width: 100%;
+  gap: 40px 62px;
+  color: #ffffff;
+  font: 400 18px Inter, sans-serif;
+}
+
+.services,
+.aboutUs,
+.articles,
+.healthcareProfessionals {
+  flex-grow: 1;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.contentSection {
+  position: relative;
+  margin: 128px 0 -34px;
+}
+
+.contentColumns {
+  gap: 20px;
+  display: flex;
+}
+
+.textColumn {
+  display: flex;
+  flex-direction: column;
+  line-height: normal;
+  width: 50%;
+  margin-left: 0px;
+}
+
+.textContent {
+  position: relative;
+  display: flex;
+  margin-top: 391px;
+  flex-direction: column;
+  color: #ffffff;
+  font: 400 26px Inter, sans-serif;
+}
+
+.mainDescription {
+  margin-right: 38px;
+}
+
+/* Updated .ctaWrapper and .ctaButton for centering text */
+.ctaWrapper {
+  display: flex;
+  justify-content: center; /* Center the button horizontally */
+  align-items: center; /* Center the button vertically */
+}
+
+.ctaButton {
+  display: flex;
+  justify-content: center; /* Center the text horizontally */
+  align-items: center; /* Center the text vertically */
+  width: 100%; /* Ensure the button takes up the full width of its container */
+  height: 100%; /* Ensure the button takes up the full height of its container */
+  padding: 13px 64px 22px; /* Adjust padding as needed */
+  border: 1px solid #ffffff;
+  background: none;
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+  text-align: center; /* Ensure text is centered */
+}
+
+.ctaIcon {
+  width: 100%;
+  height: auto;
+}
+
+.imageColumn {
+  display: flex;
+  flex-direction: column;
+  line-height: normal;
+  width: 50%;
+  margin-left: 20px;
+}
+
+.featureImage {
+  aspect-ratio: 1.11;
+  object-fit: contain;
+  object-position: center;
+  width: 100%;
+  flex-grow: 1;
+}
+
+@media (max-width: 991px) {
+  .landingPage,
+  .clipPathGroup {
+    max-width: 100%;
+  }
+
+  .mainContent {
+    max-width: 100%;
+  }
+
+  .contentSection {
+    max-width: 100%;
+  }
+
+  .contentColumns {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0px;
+  }
+
+  .textColumn,
+  .imageColumn {
+    width: 100%;
+  }
+
+  .textContent {
+    max-width: 100%;
+  }
+
+  .mainDescription {
+    max-width: 100%;
+    margin-right: 10px;
+  }
+
+  .subDescription {
+    max-width: 100%;
+  }
+
+  .ctaButton {
+    padding: 0 20px;
+  }
+
+  .featureImage {
+    max-width: 100%;
+    margin-top: 40px;
+  }
+
+  .howItWorksLink {
+    cursor: pointer; /* Change cursor to pointer */
+    color: #4000ba; /* Optional: Change text color to blue */
+    text-decoration: underline; /* Optional: Add underline */
+  }
+
+  .howItWorksLink:hover {
+    color: #4000ba; /* Optional: Change color on hover */
+  }
+}

@@ -1,0 +1,221 @@
+.howItWorksFrame {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+}
+
+.howItWorks {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  justify-content: start;
+}
+
+@media (max-width: 991px) {
+  .howItWorks {
+    max-width: 100%;
+  }
+}
+
+.clipPathGroup {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+
+@media (max-width: 991px) {
+  .clipPathGroup {
+    max-width: 100%;
+  }
+}
+
+.vector {
+  background-color: #fff;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+
+@media (max-width: 991px) {
+  .vector {
+    max-width: 100%;
+  }
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 1080px;
+  width: 100%;
+  align-items: center;
+  padding: 48px 0 131px;
+}
+
+@media (max-width: 991px) {
+  .container {
+    max-width: 100%;
+    padding-bottom: 100px;
+  }
+}
+
+.backgroundImage {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.header {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 1701px;
+  gap: 20px;
+  color: #eeeef5;
+  justify-content: space-between;
+  font: 400 24px DM Sans, sans-serif;
+}
+
+@media (max-width: 991px) {
+  .header {
+    max-width: 100%;
+  }
+}
+
+.divider {
+  aspect-ratio: 1000;
+  object-fit: contain;
+  object-position: center;
+  width: 100%;
+  align-self: stretch;
+  margin-top: 35px;
+}
+
+@media (max-width: 991px) {
+  .divider {
+    max-width: 100%;
+  }
+}
+
+.title {
+  position: relative;
+  color: #eeeef5;
+  text-align: center;
+  margin-top: 175px;
+  font: 400 100px Inter, sans-serif;
+}
+
+@media (max-width: 991px) {
+  .title {
+    max-width: 100%;
+    margin-top: 40px;
+    font-size: 40px;
+  }
+}
+
+.pointsContainer {
+  position: relative;
+  width: 100%;
+  max-width: 1677px;
+  margin: 138px 0 -26px;
+}
+
+@media (max-width: 991px) {
+  .pointsContainer {
+    max-width: 100%;
+    margin: 40px 0 10px;
+  }
+}
+
+.pointsWrapper {
+  gap: 20px;
+  display: flex;
+}
+
+@media (max-width: 991px) {
+  .pointsWrapper {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0px;
+  }
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  line-height: normal;
+  width: 33%;
+  margin-left: 0px;
+}
+
+@media (max-width: 991px) {
+  .column {
+    width: 100%;
+  }
+}
+
+.pointContent {
+  position: relative;
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  color: #eeeef5;
+  font: 400 20px DM Sans, sans-serif;
+}
+
+@media (max-width: 991px) {
+  .pointContent {
+    max-width: 100%;
+    margin-top: 40px;
+  }
+}
+
+.pointIcon {
+  aspect-ratio: 1;
+  object-fit: contain;
+  object-position: center;
+  width: 128px;
+  align-self: center;
+  max-width: 100%;
+}
+
+.pointTitle {
+  font-size: 24px;
+  align-self: center;
+  margin-top: 34px;
+}
+
+.pointDescription {
+  margin-top: 11px;
+}
+
+@media (max-width: 991px) {
+  .pointDescription {
+    max-width: 100%;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.howItWorksLink {
+  cursor: pointer; /* Change cursor to pointer */
+  color: #4b005a; /* Optional: Change text color to blue */
+  text-decoration: underline; /* Optional: Add underline */
+}
+
+.howItWorksLink:hover {
+  color: #4b005a; /* Optional: Change color on hover */
+}
